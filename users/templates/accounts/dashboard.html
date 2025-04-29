@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}Painel do Usuário{% endblock %}
+
+{% block content %}
+<h2 class="mt-4 mb-4">Painel do Usuário</h2>
+
+<div class="card">
+    <div class="card-header">
+        Informações do Perfil
+    </div>
+    <div class="card-body">
+        <p><strong>Nome:</strong> {{ user.nome }}</p>
+        <p><strong>Email:</strong> {{ user.email }}</p>
+        <p><strong>Data de Nascimento:</strong> {{ user.data_nascimento|date:"d/m/Y" }}</p>
+        <p><strong>Membro desde:</strong> {{ user.date_joined|date:"d/m/Y H:i" }}</p>
+        <a href="{% url 'profile_update' %}" class="btn btn-secondary">Editar Perfil</a>
+        <a href="{% url 'password_change' %}" class="btn btn-warning">Alterar Senha</a>
+    </div>
+</div>
+
+<div class="mt-4">
+    <a href="{% url 'logout' %}" class="btn btn-danger">Sair</a>
+</div>
+{% endblock %}
+
