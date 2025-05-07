@@ -1,10 +1,15 @@
 from django.db import models
 import uuid
+import pyautogui
 import hashlib
 import os
 
 def generate_salt():
-    return os.urandom(16).hex()
+    return os.urandom(16).hex() + get_pointer_location()
+
+def get_pointer_location():
+    x, y = pyautogui.position()
+    return x * y
 
 def hash_with_salt(data, salt):
     return hashlib.sha256((salt + data).encode('utf-8')).hexdigest()
@@ -33,7 +38,7 @@ class UserLog(models.Model):
     user = models.ForeignKey(Users, on_delete=models.CASCADE)
     acao = models.CharField(max_length=255)
     data_hora = models.DateTimeField(auto_now_add=True)
-    salt = models.CharField(max_length=32, default=generate_salt)
+    salt = models.CharField(max_length=100, default=generate_salt)
     hash_acao = models.CharField(max_length=255, blank=True)
 
     def save(self, *args, **kwargs):
