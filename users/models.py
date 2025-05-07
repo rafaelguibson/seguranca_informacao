@@ -5,7 +5,7 @@ import hashlib
 import os
 
 def generate_salt():
-    return os.urandom(16).hex() + get_pointer_location()
+    return os.urandom(16).hex() + str(get_pointer_location())
 
 def get_pointer_location():
     x, y = pyautogui.position()
@@ -20,7 +20,7 @@ class Users(models.Model):
     email = models.EmailField(unique=True)
     data_nascimento = models.DateField()
     senha = models.CharField(max_length=255)
-    salt = models.CharField(max_length=32, default=generate_salt)
+    salt = models.CharField(max_length=100, default=generate_salt)
     ultimo_acesso = models.DateTimeField(null=True, blank=True)
 
     def set_password(self, raw_password):
