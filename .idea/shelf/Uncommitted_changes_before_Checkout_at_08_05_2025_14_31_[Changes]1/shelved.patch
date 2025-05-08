@@ -1,0 +1,252 @@
+Index: users/templates/base.html
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><!DOCTYPE html>\r\n<html lang=\"pt-br\">\r\n<head>\r\n    <meta charset=\"UTF-8\">\r\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\r\n    <title>{% block title %}Projeto de Segurança Django{% endblock %}</title>\r\n    <!-- Bootstrap CSS (será adicionado na etapa 7) -->\r\n    <link href=\"https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css\" rel=\"stylesheet\">\r\n    <style>\r\n        body { padding-top: 5rem; }\r\n        .container { max-width: 960px; }\r\n        .alert { margin-top: 1rem; }\r\n    </style>\r\n</head>\r\n<body>\r\n\r\n<nav class=\"navbar navbar-expand-md navbar-dark bg-dark fixed-top\">\r\n    <div class=\"container-fluid\">\r\n        <a class=\"navbar-brand\" href=\"#\">Segurança Django</a>\r\n        <button class=\"navbar-toggler\" type=\"button\" data-bs-toggle=\"collapse\" data-bs-target=\"#navbarCollapse\" aria-controls=\"navbarCollapse\" aria-expanded=\"false\" aria-label=\"Toggle navigation\">\r\n            <span class=\"navbar-toggler-icon\"></span>\r\n        </button>\r\n        <div class=\"collapse navbar-collapse\" id=\"navbarCollapse\">\r\n            <ul class=\"navbar-nav me-auto mb-2 mb-md-0\">\r\n                {% if user.is_authenticated %}\r\n                    <li class=\"nav-item\">\r\n                        <a class=\"nav-link\" href=\"{% url 'dashboard' %}\">Painel</a>\r\n                    </li>\r\n                {% endif %}\r\n            </ul>\r\n            <ul class=\"navbar-nav ms-auto mb-2 mb-md-0\">\r\n                 {% if user.is_authenticated %}\r\n                    <li class=\"nav-item dropdown\">\r\n                        <a class=\"nav-link dropdown-toggle\" href=\"#\" id=\"navbarDropdown\" role=\"button\" data-bs-toggle=\"dropdown\" aria-expanded=\"false\">\r\n                            Olá, {{ user.get_short_name }}\r\n                        </a>\r\n                        <ul class=\"dropdown-menu dropdown-menu-end\" aria-labelledby=\"navbarDropdown\">\r\n                            <li><a class=\"dropdown-item\" href=\"{% url 'profile_update' %}\">Editar Perfil</a></li>\r\n                            <li><a class=\"dropdown-item\" href=\"{% url 'password_change' %}\">Mudar Senha</a></li>\r\n                            <li><hr class=\"dropdown-divider\"></li>\r\n                            <li><a class=\"dropdown-item\" href=\"{% url 'logout' %}\">Sair</a></li>\r\n                        </ul>\r\n                    </li>\r\n                {% else %}\r\n                    <li class=\"nav-item\">\r\n                        <a class=\"nav-link\" href=\"{% url 'login' %}\">Login</a>\r\n                    </li>\r\n                    <li class=\"nav-item\">\r\n                        <a class=\"nav-link\" href=\"{% url 'register' %}\">Cadastro</a>\r\n                    </li>\r\n                {% endif %}\r\n            </ul>\r\n        </div>\r\n    </div>\r\n</nav>\r\n\r\n<main class=\"container\">\r\n    {% if messages %}\r\n        {% for message in messages %}\r\n            <div class=\"alert alert-{{ message.tags }} alert-dismissible fade show\" role=\"alert\">\r\n                {{ message }}\r\n                <button type=\"button\" class=\"btn-close\" data-bs-dismiss=\"alert\" aria-label=\"Close\"></button>\r\n            </div>\r\n        {% endfor %}\r\n    {% endif %}\r\n\r\n    {% block content %}\r\n    <!-- O conteúdo específico da página será inserido aqui -->\r\n    {% endblock %}\r\n</main>\r\n\r\n<!-- Bootstrap JS Bundle (será adicionado na etapa 7) -->\r\n<script src=\"https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js\"></script>\r\n</body>\r\n</html>\r\n\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/users/templates/base.html b/users/templates/base.html
+--- a/users/templates/base.html	(revision 32330ce3fe900550fffb71ac49360ca7f8530d1f)
++++ b/users/templates/base.html	(date 1745968535811)
+@@ -1,76 +1,121 @@
++{% load static %}
+ <!DOCTYPE html>
+ <html lang="pt-br">
+-<head>
+-    <meta charset="UTF-8">
+-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+-    <title>{% block title %}Projeto de Segurança Django{% endblock %}</title>
++  <head>
++    <meta charset="UTF-8" />
++    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
++    <title>
++      {% block title %}Projeto de Segurança Da Informação{% endblock %}
++    </title>
+     <!-- Bootstrap CSS (será adicionado na etapa 7) -->
+-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
++    <link
++      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
++      rel="stylesheet"
++    />
+     <style>
+-        body { padding-top: 5rem; }
+-        .container { max-width: 960px; }
+-        .alert { margin-top: 1rem; }
++      body {
++        padding-top: 5rem;
++      }
++      .container {
++        max-width: 960px;
++      }
++      .alert {
++        margin-top: 1rem;
++      }
+     </style>
+-</head>
+-<body>
+-
+-<nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
+-    <div class="container-fluid">
+-        <a class="navbar-brand" href="#">Segurança Django</a>
+-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+-            <span class="navbar-toggler-icon"></span>
++  </head>
++  <body>
++    <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
++      <div class="container-fluid">
++        <img src="{% static 'assets/logo.svg' %}" alt="Logo" height="40" />
++        <a class="navbar-brand" href="#"
++          >&nbsp;&nbsp;&nbsp;Segurança da Informação - UEG</a
++        >
++        <button
++          class="navbar-toggler"
++          type="button"
++          data-bs-toggle="collapse"
++          data-bs-target="#navbarCollapse"
++          aria-controls="navbarCollapse"
++          aria-expanded="false"
++          aria-label="Toggle navigation"
++        >
++          <span class="navbar-toggler-icon"></span>
+         </button>
+         <div class="collapse navbar-collapse" id="navbarCollapse">
+-            <ul class="navbar-nav me-auto mb-2 mb-md-0">
+-                {% if user.is_authenticated %}
+-                    <li class="nav-item">
+-                        <a class="nav-link" href="{% url 'dashboard' %}">Painel</a>
+-                    </li>
+-                {% endif %}
+-            </ul>
+-            <ul class="navbar-nav ms-auto mb-2 mb-md-0">
+-                 {% if user.is_authenticated %}
+-                    <li class="nav-item dropdown">
+-                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+-                            Olá, {{ user.get_short_name }}
+-                        </a>
+-                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+-                            <li><a class="dropdown-item" href="{% url 'profile_update' %}">Editar Perfil</a></li>
+-                            <li><a class="dropdown-item" href="{% url 'password_change' %}">Mudar Senha</a></li>
+-                            <li><hr class="dropdown-divider"></li>
+-                            <li><a class="dropdown-item" href="{% url 'logout' %}">Sair</a></li>
+-                        </ul>
+-                    </li>
+-                {% else %}
+-                    <li class="nav-item">
+-                        <a class="nav-link" href="{% url 'login' %}">Login</a>
+-                    </li>
+-                    <li class="nav-item">
+-                        <a class="nav-link" href="{% url 'register' %}">Cadastro</a>
+-                    </li>
+-                {% endif %}
+-            </ul>
++          <ul class="navbar-nav me-auto mb-2 mb-md-0">
++            {% if user.is_authenticated %}
++            <li class="nav-item">
++              <a class="nav-link" href="{% url 'dashboard' %}">Painel</a>
++            </li>
++            {% endif %}
++          </ul>
++          <ul class="navbar-nav ms-auto mb-2 mb-md-0">
++            {% if user.is_authenticated %}
++            <li class="nav-item dropdown">
++              <a
++                class="nav-link dropdown-toggle"
++                href="#"
++                id="navbarDropdown"
++                role="button"
++                data-bs-toggle="dropdown"
++                aria-expanded="false"
++              >
++                Olá, {{ user.get_short_name }}
++              </a>
++              <ul
++                class="dropdown-menu dropdown-menu-end"
++                aria-labelledby="navbarDropdown"
++              >
++                <li>
++                  <a class="dropdown-item" href="{% url 'profile_update' %}"
++                    >Editar Perfil</a
++                  >
++                </li>
++                <li>
++                  <a class="dropdown-item" href="{% url 'password_change' %}"
++                    >Mudar Senha</a
++                  >
++                </li>
++                <li><hr class="dropdown-divider" /></li>
++                <li>
++                  <a class="dropdown-item" href="{% url 'logout' %}">Sair</a>
++                </li>
++              </ul>
++            </li>
++            {% else %}
++            <li class="nav-item">
++              <a class="nav-link" href="{% url 'login' %}">Login</a>
++            </li>
++            <li class="nav-item">
++              <a class="nav-link" href="{% url 'register' %}">Cadastro</a>
++            </li>
++            {% endif %}
++          </ul>
+         </div>
+-    </div>
+-</nav>
++      </div>
++    </nav>
+ 
+-<main class="container">
+-    {% if messages %}
+-        {% for message in messages %}
+-            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+-                {{ message }}
+-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+-            </div>
+-        {% endfor %}
+-    {% endif %}
+-
+-    {% block content %}
+-    <!-- O conteúdo específico da página será inserido aqui -->
+-    {% endblock %}
+-</main>
++    <main class="container">
++      {% if messages %} {% for message in messages %}
++      <div
++        class="alert alert-{{ message.tags }} alert-dismissible fade show"
++        role="alert"
++      >
++        {{ message }}
++        <button
++          type="button"
++          class="btn-close"
++          data-bs-dismiss="alert"
++          aria-label="Close"
++        ></button>
++      </div>
++      {% endfor %} {% endif %} {% block content %}
++      <!-- O conteúdo específico da página será inserido aqui -->
++      {% endblock %}
++    </main>
+ 
+-<!-- Bootstrap JS Bundle (será adicionado na etapa 7) -->
+-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+-</body>
++    <!-- Bootstrap JS Bundle (será adicionado na etapa 7) -->
++    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
++  </body>
+ </html>
+-
+Index: app/settings.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>from pathlib import Path\r\n\r\n# Build paths inside the project like this: BASE_DIR / 'subdir'.\r\nBASE_DIR = Path(__file__).resolve().parent.parent\r\n\r\n\r\n# Quick-start development settings - unsuitable for production\r\n# See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/\r\n\r\n# SECURITY WARNING: keep the secret key used in production secret!\r\nSECRET_KEY = 'django-insecure-fa9$690qgdc-vx$laotypvsxqnf=!22tk9ul9te5!66m*080&p'\r\n\r\n# SECURITY WARNING: don't run with debug turned on in production!\r\nDEBUG = True\r\n\r\nALLOWED_HOSTS = []\r\n\r\n\r\n# Application definition\r\n\r\nINSTALLED_APPS = [\r\n    'django.contrib.admin',\r\n    'django.contrib.auth',\r\n    'django.contrib.contenttypes',\r\n    'django.contrib.sessions',\r\n    'django.contrib.messages',\r\n    'django.contrib.staticfiles',\r\n    # Adicionados\r\n    'users',\r\n    'crispy_forms',\r\n    'crispy_bootstrap5',\r\n]\r\n\r\nCRISPY_ALLOWED_TEMPLATE_PACKS = \"bootstrap5\"\r\nCRISPY_TEMPLATE_PACK = \"bootstrap5\"\r\n\r\nMIDDLEWARE = [\r\n    'django.middleware.security.SecurityMiddleware',\r\n    'django.contrib.sessions.middleware.SessionMiddleware',\r\n    'django.middleware.common.CommonMiddleware',\r\n    'django.middleware.csrf.CsrfViewMiddleware',\r\n    'django.contrib.auth.middleware.AuthenticationMiddleware',\r\n    'django.contrib.messages.middleware.MessageMiddleware',\r\n    'django.middleware.clickjacking.XFrameOptionsMiddleware',\r\n]\r\n\r\nROOT_URLCONF = 'app.urls'\r\n\r\nTEMPLATES = [\r\n    {\r\n        'BACKEND': 'django.template.backends.django.DjangoTemplates',\r\n        'DIRS': [BASE_DIR / 'users' / 'templates'],\r\n        'APP_DIRS': True,\r\n        'OPTIONS': {\r\n            'context_processors': [\r\n                'django.template.context_processors.request',\r\n                'django.contrib.auth.context_processors.auth',\r\n                'django.contrib.messages.context_processors.messages',\r\n            ],\r\n        },\r\n    },\r\n]\r\n\r\nWSGI_APPLICATION = 'app.wsgi.application'\r\n\r\n\r\n# Database\r\n# https://docs.djangoproject.com/en/5.2/ref/settings/#databases\r\n\r\nDATABASES = {\r\n    'default': {\r\n        'ENGINE': 'django.db.backends.sqlite3',\r\n        'NAME': BASE_DIR / 'db.sqlite3',\r\n    }\r\n}\r\n\r\n\r\n# Password validation\r\n# https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators\r\n\r\nAUTH_PASSWORD_VALIDATORS = [\r\n    {\r\n        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',\r\n    },\r\n    {\r\n        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',\r\n    },\r\n    {\r\n        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',\r\n    },\r\n    {\r\n        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',\r\n    },\r\n]\r\n\r\n\r\n# Internationalization\r\n# https://docs.djangoproject.com/en/5.2/topics/i18n/\r\n\r\nLANGUAGE_CODE = 'en-us'\r\n\r\nTIME_ZONE = 'UTC'\r\n\r\nUSE_I18N = True\r\n\r\nUSE_TZ = True\r\n\r\n\r\n# Static files (CSS, JavaScript, Images)\r\n# https://docs.djangoproject.com/en/5.2/howto/static-files/\r\n\r\nSTATIC_URL = 'static/'\r\n\r\n# Default primary key field type\r\n# https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field\r\n\r\nDEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/settings.py b/app/settings.py
+--- a/app/settings.py	(revision 32330ce3fe900550fffb71ac49360ca7f8530d1f)
++++ b/app/settings.py	(date 1745968161880)
+@@ -109,7 +109,7 @@
+ # Static files (CSS, JavaScript, Images)
+ # https://docs.djangoproject.com/en/5.2/howto/static-files/
+ 
+-STATIC_URL = 'static/'
++STATIC_URL = '/static/'
+ 
+ # Default primary key field type
+ # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
+Index: users/models.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>from django.db import models\r\nimport uuid\r\nimport hashlib\r\nimport os\r\n\r\ndef generate_salt():\r\n    return os.urandom(16).hex()\r\n\r\ndef hash_with_salt(data, salt):\r\n    return hashlib.sha256((salt + data).encode('utf-8')).hexdigest()\r\n\r\nclass Users(models.Model):\r\n    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)\r\n    nome = models.CharField(max_length=255)\r\n    email = models.EmailField(unique=True)\r\n    data_nascimento = models.DateField()\r\n    senha = models.CharField(max_length=255)\r\n    salt = models.CharField(max_length=32, default=generate_salt)\r\n    ultimo_acesso = models.DateTimeField(null=True, blank=True)\r\n\r\n    def set_password(self, raw_password):\r\n        self.salt = generate_salt()\r\n        self.senha = hash_with_salt(raw_password, self.salt)\r\n    \r\n    def check_password(self, raw_password):\r\n        return self.senha == hash_with_salt(raw_password, self.salt)\r\n\r\n    def __str__(self):\r\n        return self.nome\r\n\r\nclass UserLog(models.Model):\r\n    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)\r\n    user = models.ForeignKey(Users, on_delete=models.CASCADE)\r\n    acao = models.CharField(max_length=255)\r\n    data_hora = models.DateTimeField(auto_now_add=True)\r\n    salt = models.CharField(max_length=32, default=generate_salt)\r\n    hash_acao = models.CharField(max_length=255, blank=True)\r\n\r\n    def save(self, *args, **kwargs):\r\n        self.hash_acao = hash_with_salt(self.acao, self.salt)\r\n        super().save(*args, **kwargs)\r\n\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/users/models.py b/users/models.py
+--- a/users/models.py	(revision 32330ce3fe900550fffb71ac49360ca7f8530d1f)
++++ b/users/models.py	(date 1745975294541)
+@@ -10,6 +10,7 @@
+     return hashlib.sha256((salt + data).encode('utf-8')).hexdigest()
+ 
+ class Users(models.Model):
++    # Adicionar criptografia em todos os campos
+     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+     nome = models.CharField(max_length=255)
+     email = models.EmailField(unique=True)
+Index: users/forms.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>from django import forms\r\nfrom .models import Users\r\nimport re\r\n\r\nclass CadastroForm(forms.ModelForm):\r\n    senha = forms.CharField(widget=forms.PasswordInput)\r\n\r\n    class Meta:\r\n        model = Users\r\n        fields = ['nome', 'email', 'data_nascimento', 'senha']\r\n\r\n    def clean_senha(self):\r\n        senha = self.cleaned_data.get('senha')\r\n        if len(senha) < 8:\r\n            raise forms.ValidationError(\"A senha deve ter no mínimo 8 caracteres.\")\r\n        if not re.search(r'[A-Z]', senha):\r\n            raise forms.ValidationError(\"A senha deve conter pelo menos uma letra maiúscula.\")\r\n        if not re.search(r'[a-z]', senha):\r\n            raise forms.ValidationError(\"A senha deve conter pelo menos uma letra minúscula.\")\r\n        if not re.search(r'[0-9]', senha):\r\n            raise forms.ValidationError(\"A senha deve conter pelo menos um número.\")\r\n        if not re.search(r'[\\W_]', senha):\r\n            raise forms.ValidationError(\"A senha deve conter pelo menos um caractere especial.\")\r\n        return senha\r\n\r\nclass LoginForm(forms.Form):\r\n    email = forms.EmailField()\r\n    senha = forms.CharField(widget=forms.PasswordInput)\r\n\r\nclass AtualizarForm(forms.ModelForm):\r\n    class Meta:\r\n        model = Users\r\n        fields = ['nome', 'email', 'data_nascimento']\r\n\r\nclass EsqueciSenhaForm(forms.Form):\r\n    email = forms.EmailField()\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/users/forms.py b/users/forms.py
+--- a/users/forms.py	(revision 32330ce3fe900550fffb71ac49360ca7f8530d1f)
++++ b/users/forms.py	(date 1745974901923)
+@@ -11,6 +11,7 @@
+ 
+     def clean_senha(self):
+         senha = self.cleaned_data.get('senha')
++        # Comentar sobre a possivel vulnerabilidade da validação  por engenharia reversa.
+         if len(senha) < 8:
+             raise forms.ValidationError("A senha deve ter no mínimo 8 caracteres.")
+         if not re.search(r'[A-Z]', senha):
