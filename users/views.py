@@ -1,14 +1,17 @@
 from django.shortcuts import render, redirect
 from django.utils import timezone
 from django.contrib import messages
-from .forms import CadastroForm, LoginForm, AtualizarForm, EsqueciSenhaForm
-from .models import Users, UserLog
 from django.urls import reverse
 from django.core.mail import send_mail
 from django.conf import settings
 import uuid
 
-# Armazena tokens de reset temporariamente (em produção use cache seguro)
+from .forms import CadastroForm, LoginForm, AtualizarForm, EsqueciSenhaForm
+from .models import (
+    Users, UserSalt, UserPassword, UserLog, VerificationToken
+)
+
+# Armazena tokens temporários
 reset_tokens = {}
 
 def cadastrar(request):
@@ -16,14 +19,46 @@ def cadastrar(request):
         form = CadastroForm(request.POST)
         if form.is_valid():
             user = form.save(commit=False)
-            user.set_password(form.cleaned_data['senha'])
+            user.is_active = False
             user.save()
-            UserLog.objects.create(user=user, acao="Cadastro realizado")
-            messages.success(request, "Cadastro realizado com sucesso!")
+
+            salt_obj = UserSalt.objects.create(user=user)
+            senha_obj = UserPassword(user=user)
+            senha_obj.set_password(form.cleaned_data['senha'], salt_obj.salt)
+            senha_obj.save()
+
+            token = VerificationToken.objects.create(user=user)
+            link = request.build_absolute_uri(reverse('verificar_email', args=[token.token]))
+
+            send_mail(
+                subject='Verifique seu cadastro',
+                message=f'Olá {user.nome}, clique no link para confirmar seu cadastro:\n\n{link}',
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[user.email],
+            )
+
+            messages.success(request, "Cadastro criado! Verifique seu e-mail.")
             return redirect('login')
     else:
         form = CadastroForm()
     return render(request, 'accounts/register.html', {'form': form})
+
+def verificar_email(request, token):
+    try:
+        token_obj = VerificationToken.objects.get(token=token, used=False)
+        user = token_obj.user
+        user.is_active = True
+        user.save()
+
+        token_obj.used = True
+        token_obj.save()
+
+        messages.success(request, "Conta verificada com sucesso!")
+        return redirect('login')
+
+    except VerificationToken.DoesNotExist:
+        messages.error(request, "Token inválido ou expirado.")
+        return redirect('login')
 
 def login_view(request):
     if request.method == 'POST':
@@ -31,15 +66,20 @@ def login_view(request):
         if form.is_valid():
             try:
                 user = Users.objects.get(email=form.cleaned_data['email'])
-                if user.check_password(form.cleaned_data['senha']):
-                    request.session['user_id'] = str(user.id)
-                    user.ultimo_acesso = timezone.now()
-                    user.save()
-                    UserLog.objects.create(user=user, acao="Login realizado")
-                    messages.success(request, "Login realizado com sucesso!")
-                    return redirect('dashboard')
+                if not user.is_active:
+                    messages.warning(request, "Conta ainda não verificada. Verifique seu e-mail.")
                 else:
-                    messages.error(request, "Senha incorreta.")
+                    salt = UserSalt.objects.get(user=user)
+                    senha = UserPassword.objects.get(user=user)
+                    if senha.check_password(form.cleaned_data['senha'], salt.salt):
+                        request.session['user_id'] = str(user.id)
+                        user.ultimo_acesso = timezone.now()
+                        user.save()
+                        UserLog.objects.create(user=user, acao="Login realizado")
+                        messages.success(request, "Login realizado com sucesso!")
+                        return redirect('dashboard')
+                    else:
+                        messages.error(request, "Senha incorreta.")
             except Users.DoesNotExist:
                 messages.error(request, "Usuário não encontrado.")
     else:
@@ -74,19 +114,21 @@ def password_change(request):
     if not user_id:
         return redirect('login')
     user = Users.objects.get(id=user_id)
+    salt = UserSalt.objects.get(user=user)
+    senha = UserPassword.objects.get(user=user)
 
     if request.method == 'POST':
         senha_atual = request.POST.get('senha_atual')
         nova_senha = request.POST.get('nova_senha')
         nova_senha_confirm = request.POST.get('nova_senha_confirm')
 
-        if not user.check_password(senha_atual):
+        if not senha.check_password(senha_atual, salt.salt):
             messages.error(request, "Senha atual incorreta.")
         elif nova_senha != nova_senha_confirm:
             messages.error(request, "As novas senhas não coincidem.")
         else:
-            user.set_password(nova_senha)
-            user.save()
+            senha.set_password(nova_senha, salt.salt)
+            senha.save()
             UserLog.objects.create(user=user, acao="Senha alterada")
             messages.success(request, "Senha alterada com sucesso!")
             return redirect('dashboard')
@@ -131,13 +173,15 @@ def password_reset_confirm(request, token):
         return render(request, 'accounts/password_reset_confirm.html', {'validlink': False})
 
     user = Users.objects.get(id=user_id)
+    salt = UserSalt.objects.get(user=user)
+    senha = UserPassword.objects.get(user=user)
 
     if request.method == 'POST':
-        senha = request.POST.get('nova_senha')
-        confirmar_senha = request.POST.get('confirmar_senha')
-        if senha == confirmar_senha:
-            user.set_password(senha)
-            user.save()
+        nova = request.POST.get('nova_senha')
+        confirmar = request.POST.get('confirmar_senha')
+        if nova == confirmar:
+            senha.set_password(nova, salt.salt)
+            senha.save()
             UserLog.objects.create(user=user, acao="Senha redefinida via reset")
             del reset_tokens[token]
             messages.success(request, "Senha redefinida com sucesso.")

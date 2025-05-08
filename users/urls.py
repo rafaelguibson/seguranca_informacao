@@ -12,4 +12,5 @@ urlpatterns = [
     path('password/reset/confirm/<str:token>/', views.password_reset_confirm, name='password_reset_confirm'),
     path('password/reset/complete/', views.password_reset_complete, name='password_reset_complete'),
     path('logout/', views.logout_view, name='logout'),
+    path('verificar/<uuid:token>/', views.verificar_email, name='verificar_email'),
 ]

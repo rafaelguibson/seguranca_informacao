@@ -3,11 +3,18 @@ from .models import Users
 import re
 
 class CadastroForm(forms.ModelForm):
-    senha = forms.CharField(widget=forms.PasswordInput)
+    senha = forms.CharField(widget=forms.PasswordInput, label="Senha")
+    confirmar_senha = forms.CharField(widget=forms.PasswordInput, label="Confirmar Senha")
 
     class Meta:
         model = Users
         fields = ['nome', 'email', 'data_nascimento', 'senha']
+
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if Users.objects.filter(email=email).exists():
+            raise forms.ValidationError("Este e-mail já está cadastrado.")
+        return email
 
     def clean_senha(self):
         senha = self.cleaned_data.get('senha')
@@ -23,9 +30,17 @@ class CadastroForm(forms.ModelForm):
             raise forms.ValidationError("A senha deve conter pelo menos um caractere especial.")
         return senha
 
+    def clean(self):
+        cleaned_data = super().clean()
+        senha = cleaned_data.get('senha')
+        confirmar = cleaned_data.get('confirmar_senha')
+
+        if senha and confirmar and senha != confirmar:
+            self.add_error('confirmar_senha', "As senhas não coincidem.")
+
 class LoginForm(forms.Form):
-    email = forms.EmailField()
-    senha = forms.CharField(widget=forms.PasswordInput)
+    email = forms.EmailField(label="Email")
+    senha = forms.CharField(widget=forms.PasswordInput, label="Senha")
 
 class AtualizarForm(forms.ModelForm):
     class Meta:
@@ -33,4 +48,4 @@ class AtualizarForm(forms.ModelForm):
         fields = ['nome', 'email', 'data_nascimento']
 
 class EsqueciSenhaForm(forms.Form):
-    email = forms.EmailField()
+    email = forms.EmailField(label="Email")
