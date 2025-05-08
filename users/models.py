@@ -10,7 +10,7 @@ def get_pointer_location():
         x, y = pyautogui.position()
         return x * y
     except:
-        return 1  # fallback caso falhe
+        return os.urandom(16).hex()  # fallback caso falhe
 
 def generate_salt():
     return os.urandom(16).hex() + str(get_pointer_location())
@@ -62,12 +62,28 @@ class VerificationToken(models.Model):
 
 class UserLog(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    user = models.ForeignKey(Users, on_delete=models.CASCADE)
+
+    # Relacional, mas não exposto no log diretamente
+    user = models.ForeignKey(Users, on_delete=models.CASCADE, related_name='logs')
+
+    # Campos criptografados (hash + salt)
     acao = models.CharField(max_length=255)
     data_hora = models.DateTimeField(auto_now_add=True)
+
+    # Criptografados
+    encrypted_user_id = models.CharField(max_length=255, blank=True)
+    encrypted_acao = models.CharField(max_length=255, blank=True)
+    encrypted_data_hora = models.CharField(max_length=255, blank=True)
+
+    # Proteção
     salt = models.CharField(max_length=100, default=generate_salt)
-    hash_acao = models.CharField(max_length=255, blank=True)
 
     def save(self, *args, **kwargs):
-        self.hash_acao = hash_with_salt(self.acao, self.salt)
+        # Criptografa os dados sensíveis
+        self.encrypted_user_id = hash_with_salt(str(self.user.id), self.salt)
+        self.encrypted_acao = hash_with_salt(self.acao, self.salt)
+        self.encrypted_data_hora = hash_with_salt(str(self.data_hora), self.salt)
         super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"Log seguro de {self.user.email} em {self.data_hora.strftime('%d/%m/%Y %H:%M')}"
