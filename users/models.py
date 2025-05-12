@@ -6,6 +6,7 @@ import os
 def generate_salt():
     return os.urandom(16).hex()
 
+# Adicionar captura da posição do mouse para o sal
 def hash_with_salt(data, salt):
     return hashlib.sha256((salt + data).encode('utf-8')).hexdigest()
 
